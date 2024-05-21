@@ -1,4 +1,4 @@
-from textnode import TextNode, text_node_to_html_node, split_nodes_delimiter, extract_markdown_images, extract_markdown_links,split_nodes_image, split_nodes_link
+from textnode import TextNode, text_node_to_html_node, split_nodes_delimiter, extract_markdown_images, extract_markdown_links,split_nodes_image, split_nodes_link, text_to_textnodes
 from htmlnode import HTMLNode, LeafNode, ParentNode
 
 def main():
@@ -76,12 +76,15 @@ def main():
     # for node in new_nodes:
     #     print(node)
     
-    node = TextNode("[1st link](https://link1.com) text in between [2nd link](https://link2.com)[3rd link](https://link3.com) text at the end","text")
-    obtained = split_nodes_link([node])
+    # node = TextNode("[1st link](https://link1.com) text in between [2nd link](https://link2.com)[3rd link](https://link3.com) text at the end","text")
+    # obtained = split_nodes_link([node])
+    # for node in obtained:
+    #     print(node)
+
+    text = 'This is **text** with an *italic* word and a `code block` and an ![image](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png) and a [link](https://boot.dev)'
+    obtained = text_to_textnodes(text)
     for node in obtained:
         print(node)
-
-
 
 
 

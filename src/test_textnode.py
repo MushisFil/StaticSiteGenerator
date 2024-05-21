@@ -1,6 +1,6 @@
 import unittest
 
-from textnode import TextNode, text_node_to_html_node, split_nodes_delimiter, split_nodes_image, split_nodes_link
+from textnode import TextNode, text_node_to_html_node, split_nodes_delimiter, split_nodes_image, split_nodes_link, text_to_textnodes
 
 
 class TestTextNode(unittest.TestCase):
@@ -136,7 +136,29 @@ class TestTextNode(unittest.TestCase):
         # for node in obtained:
         #     print(node)
         # print("********************")
-        
+        self.assertEqual(all_equal, 1)
+    
+    def test_text_to_textnodes(self):
+        text = 'This is **text** with an *italic* word and a `code block` and an ![image](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png) and a [link](https://boot.dev)'
+        obtained = text_to_textnodes(text)
+        expected = [
+            TextNode("This is ", "text"),
+            TextNode("text", "bold"),
+            TextNode(" with an ", "text"),
+            TextNode("italic", "italic"),
+            TextNode(" word and a ", "text"),
+            TextNode("code block", "code"),
+            TextNode(" and an ", "text"),
+            TextNode("image", "image","https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png"),
+            TextNode(" and a ", "text"),
+            TextNode("link", "link", "https://boot.dev")
+        ]
+        all_equal = 1
+        for i in range(len(expected)):
+            if expected[i] != obtained[i]:
+                all_equal = 0
+        if len(expected) != len(obtained):
+            all_equal = 0
         self.assertEqual(all_equal, 1)
 
 
