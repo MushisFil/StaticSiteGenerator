@@ -198,6 +198,6 @@ def block_to_block_type(block):
         elif (inspect_lines(lines, '*', 0) or inspect_lines(lines, '-', 0)) and inspect_lines(lines, ' ', 1):
             return block_type_unordered_list
         elif check_ordered_list(lines):
-            return block_type_oredered_list
+            return block_type_ordered_list
     return block_type_paragraph
         
