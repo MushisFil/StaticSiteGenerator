@@ -1,4 +1,4 @@
-from textnode import TextNode, text_node_to_html_node, split_nodes_delimiter, extract_markdown_images, extract_markdown_links
+from textnode import TextNode, text_node_to_html_node, split_nodes_delimiter, extract_markdown_images, extract_markdown_links,split_nodes_image, split_nodes_link
 from htmlnode import HTMLNode, LeafNode, ParentNode
 
 def main():
@@ -56,13 +56,30 @@ def main():
     # node3 = TextNode("`code block`", "text")
     # new_nodes = split_nodes_delimiter([node3], "`", "text")
 
-    text = "This is text with an ![image](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png) and ![another](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/dfsdkjfd.png)"
-    extract_markdown_images(text)
-    # [("image", "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png"), ("another", "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/dfsdkjfd.png")]
+    # text = "This is text with an ![image](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png) and ![another](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/dfsdkjfd.png)"
+    # extract_markdown_images(text)
+    # # [("image", "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png"), ("another", "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/dfsdkjfd.png")]
 
-    text = "This is text with a [link](https://www.example.com) and [another](https://www.example.com/another)"
-    print(extract_markdown_links(text))
+    # text = "This is text with a [link](https://www.example.com) and [another](https://www.example.com/another)"
+    # print(extract_markdown_links(text))
     # [("link", "https://www.example.com"), ("another", "https://www.example.com/another")]
+
+    # node = TextNode(
+    #     "This is text with an ![first image](https://image1.png) and another ![second image](https://image2.png) more text","text")
+    # new_nodes = split_nodes_image([node])
+    # for node in new_nodes:
+    #     print(node)
+
+    # node = TextNode(
+    #     "![1st image](https://image1.png) text in between ![2nd image](https://image2.png)![3rd image](https://image3.png) text at the end","text")
+    # new_nodes = split_nodes_image([node])
+    # for node in new_nodes:
+    #     print(node)
+    
+    node = TextNode("[1st link](https://link1.com) text in between [2nd link](https://link2.com)[3rd link](https://link3.com) text at the end","text")
+    obtained = split_nodes_link([node])
+    for node in obtained:
+        print(node)
 
 
 

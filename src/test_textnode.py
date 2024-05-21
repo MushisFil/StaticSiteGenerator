@@ -1,6 +1,6 @@
 import unittest
 
-from textnode import TextNode, text_node_to_html_node, split_nodes_delimiter
+from textnode import TextNode, text_node_to_html_node, split_nodes_delimiter, split_nodes_image, split_nodes_link
 
 
 class TestTextNode(unittest.TestCase):
@@ -67,6 +67,78 @@ class TestTextNode(unittest.TestCase):
             if new_nodes[i] != expected[i]:
                 allTrue = 0
         self.assertEqual(allTrue, 1)
+    
+    def test_split_nodes_image1(self):
+        node = TextNode("![1st image](https://image1.png) text in between ![2nd image](https://image2.png)![3rd image](https://image3.png) text at the end","text")
+        obtained = split_nodes_image([node])
+        expected = [
+            TextNode("1st image", "image", "https://image1.png"),
+            TextNode(" text in between ", "text"),
+            TextNode("2nd image", "image", "https://image2.png"),
+            TextNode("3rd image", "image", "https://image3.png"),
+            TextNode(" text at the end", "text")
+        ]
+        all_equal = 1
+        for i in range(len(expected)):
+            if expected[i] != obtained[i]:
+                all_equal = 0
+        if len(expected) != len(obtained): all_equal = 0
+        self.assertEqual(all_equal, 1)
+    
+    def test_split_nodes_image2(self):
+        node = TextNode("![1st image](https://image1.png)![2nd image](https://image2.png)![3rd image](https://image3.png)","text")
+        obtained = split_nodes_image([node])
+        expected = [
+            TextNode("1st image", "image", "https://image1.png"),
+            TextNode("2nd image", "image", "https://image2.png"),
+            TextNode("3rd image", "image", "https://image3.png")
+        ]
+        all_equal = 1
+        for i in range(len(expected)):
+            if expected[i] != obtained[i]:
+                all_equal = 0
+        if len(expected) != len(obtained): all_equal = 0
+        self.assertEqual(all_equal, 1)
+    
+    def test_split_nodes_image3(self):
+        node = TextNode("simply text","text")
+        obtained = split_nodes_image([node])
+        expected = [
+            TextNode("simply text", "text")
+        ]
+        all_equal = 1
+        for i in range(len(expected)):
+            if expected[i] != obtained[i]:
+                all_equal = 0
+        if len(expected) != len(obtained): all_equal = 0
+        self.assertEqual(all_equal, 1)
+    
+    def test_split_nodes_link(self):
+        node = TextNode("[1st link](https://link1.com) text in between [2nd link](https://link2.com)[3rd link](https://link3.com) text at the end","text")
+        obtained = split_nodes_link([node])
+        expected = [
+            TextNode("1st link", "link", "https://link1.com"),
+            TextNode(" text in between ", "text"),
+            TextNode("2nd link", "link", "https://link2.com"),
+            TextNode("3rd link", "link", "https://link3.com"),
+            TextNode(" text at the end", "text")
+        ]
+        all_equal = 1
+        for i in range(len(expected)):
+            if expected[i] != obtained[i]:
+                all_equal = 0
+        if len(expected) != len(obtained): 
+            all_equal = 0
+        # print("*********Expected***********")
+        # for node in expected:
+        #     print(node)
+        # print("*********Obtained***********")
+        # for node in obtained:
+        #     print(node)
+        # print("********************")
+        
+        self.assertEqual(all_equal, 1)
+
 
 
 if __name__ == "__main__":
