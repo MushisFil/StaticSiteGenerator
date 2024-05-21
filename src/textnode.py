@@ -1,3 +1,4 @@
+import re
 from htmlnode import HTMLNode, LeafNode, ParentNode
 
 class TextNode:
@@ -52,3 +53,9 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
                 elif i%2 != 0:
                     new_nodes.append(TextNode(splitted[i], text_type))
     return new_nodes
+
+def extract_markdown_images(text):
+    return re.findall(r"!\[(.*?)\]\((.*?)\)", text)
+
+def extract_markdown_links(text):
+    return re.findall(r"\[(.*?)\]\((.*?)\)", text)

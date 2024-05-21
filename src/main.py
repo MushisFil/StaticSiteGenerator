@@ -1,4 +1,4 @@
-from textnode import TextNode, text_node_to_html_node, split_nodes_delimiter
+from textnode import TextNode, text_node_to_html_node, split_nodes_delimiter, extract_markdown_images, extract_markdown_links
 from htmlnode import HTMLNode, LeafNode, ParentNode
 
 def main():
@@ -44,10 +44,10 @@ def main():
     # node2 = TextNode("`code block1` word `code block2`", "text")
     # new_nodes = split_nodes_delimiter([node2], "`", "text")
 
-    node22 = TextNode("`code block1` word `code block2` word2 `codeblock3`", "text")
-    new_nodes = split_nodes_delimiter([node22], "`", "code")
-    for node in new_nodes:
-        print(node)
+    # node22 = TextNode("`code block1` word `code block2` word2 `codeblock3`", "text")
+    # new_nodes = split_nodes_delimiter([node22], "`", "code")
+    # for node in new_nodes:
+    #     print(node)
 
     # nodezero = TextNode("word word2", "text")
     # new_nodes = split_nodes_delimiter([nodezero], "`", "text")
@@ -55,6 +55,15 @@ def main():
 
     # node3 = TextNode("`code block`", "text")
     # new_nodes = split_nodes_delimiter([node3], "`", "text")
+
+    text = "This is text with an ![image](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png) and ![another](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/dfsdkjfd.png)"
+    extract_markdown_images(text)
+    # [("image", "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png"), ("another", "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/dfsdkjfd.png")]
+
+    text = "This is text with a [link](https://www.example.com) and [another](https://www.example.com/another)"
+    print(extract_markdown_links(text))
+    # [("link", "https://www.example.com"), ("another", "https://www.example.com/another")]
+
 
 
 
