@@ -1,4 +1,4 @@
-from textnode import TextNode, text_node_to_html_node, split_nodes_delimiter, extract_markdown_images, extract_markdown_links,split_nodes_image, split_nodes_link, text_to_textnodes
+from textnode import TextNode, text_node_to_html_node, split_nodes_delimiter, extract_markdown_images, extract_markdown_links,split_nodes_image, split_nodes_link, text_to_textnodes, markdown_to_blocks, block_to_block_type
 from htmlnode import HTMLNode, LeafNode, ParentNode
 
 def main():
@@ -81,10 +81,24 @@ def main():
     # for node in obtained:
     #     print(node)
 
-    text = 'This is **text** with an *italic* word and a `code block` and an ![image](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png) and a [link](https://boot.dev)'
-    obtained = text_to_textnodes(text)
-    for node in obtained:
-        print(node)
+    # text = 'This is **text** with an *italic* word and a `code block` and an ![image](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png) and a [link](https://boot.dev)'
+    # obtained = text_to_textnodes(text)
+    # for node in obtained:
+    #     print(node)
+
+    md_doc = """## This is **bolded** paragraph
+
+    This is another paragraph with *italic* text and `code` here
+    This is the same paragraph on a new line
+
+    * This is a list
+    * with items
+    """
+    blocks = markdown_to_blocks(md_doc)
+    print(blocks)
+    block_types = list(map(block_to_block_type, blocks))
+    print(block_types)
+
 
 
 

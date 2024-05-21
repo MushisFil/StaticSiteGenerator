@@ -1,5 +1,6 @@
 import re
 from htmlnode import HTMLNode, LeafNode, ParentNode
+from blockvars import *
 
 class TextNode:
     def __init__(self, text, text_type, url = None):
@@ -139,4 +140,64 @@ def text_to_textnodes(text):
     imaged = split_nodes_image(italicized)
     linked = split_nodes_link(imaged)
     return linked
+
+def markdown_to_blocks(markdown):
+    # First Blocks
+    fun = lambda x : x.lstrip(' ')
+    fun2 = lambda x: True if x != "" else False
+    blocks = list(map(fun, markdown.split('\n\n')))
+    filtered = list(filter(fun2, blocks))
+
+    # Then on each line
+    new_blocks = []
+    for block in blocks:
+        lines = list(map(fun, block.split('\n')))
+        lines_filtered = list(filter(fun2, lines))
+        new_blocks.append('\n'.join(lines_filtered))
     
+    # print(filtered)
+    # print('\n\n'.join(new_blocks))
+    return new_blocks
+
+# A function that checks whether ever first character of each element in the list starts
+# with the same character c
+def inspect_lines(lines, c, index):
+    for line in lines:
+        if line[index] != c:
+            return 0
+    return 1
+
+def check_ordered_list(lines):
+    pattern = r'^(\d+)\. .+'
+    previous_number = 0
+
+    for line in lines:
+        match = re.match(pattern, line)
+        if not match:
+            return False
+        curr_num = int(match.group(1))
+        if curr_num != previous_number + 1:
+            return False
+        previous_number = curr_num 
+    
+    return True
+
+
+
+
+def block_to_block_type(block):
+
+    if block[0] == "#":
+        return block_type_heading
+    elif block[0:3] == '```' and block[len(block)-3 : len(block)] == '```':
+        return block_type_code
+    else:
+        lines = block.split('\n')
+        if inspect_lines(lines, '>', 0):
+            return block_type_quote
+        elif (inspect_lines(lines, '*', 0) or inspect_lines(lines, '-', 0)) and inspect_lines(lines, ' ', 1):
+            return block_type_unordered_list
+        elif check_ordered_list(lines):
+            return block_type_oredered_list
+    return block_type_paragraph
+        
