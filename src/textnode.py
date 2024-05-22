@@ -183,8 +183,6 @@ def check_ordered_list(lines):
     return True
 
 
-
-
 def block_to_block_type(block):
 
     if block[0] == "#":
@@ -201,3 +199,90 @@ def block_to_block_type(block):
             return block_type_ordered_list
     return block_type_paragraph
         
+
+def helper_block_to_html(block, tag_t):
+    splitted = block.split('\n')
+    parent_list = []
+    for line in splitted:
+        filtered_line = line[2:]
+        curr_tn_children = text_to_textnodes(filtered_line)
+        curr_ln_children = []
+        for child in curr_tn_children:
+            curr_ln_children.append(text_node_to_html_node(child))
+        parent_list.append(ParentNode(tag_t, curr_ln_children))
+    return parent_list
+
+def count_heading_number(block):
+    match = re.match(r'^(#+)\s', block)
+    if match:
+        num = len(match.group(1))
+    else:
+        num = 0
+    
+    return num
+
+
+def block_to_html_node(block):
+    block_type = block_to_block_type(block)
+
+    # textnode_children = text_to_textnodes(block)
+    # leaf_children = []
+    # for child in textnode_children:
+        # leaf_children.append(text_node_to_html_node(child))
+
+    if block_type == block_type_quote:
+        filtered_lines = []
+        for line in block.split('\n'):
+            filtered_lines.append(line[1:])
+        filtered_text = '\n'.join(filtered_lines)
+        textnode_children = text_to_textnodes(filtered_text)
+        leaf_children = []
+        for child in textnode_children:
+            leaf_children.append(text_node_to_html_node(child))
+        block_parent = ParentNode("blockquote", leaf_children)
+
+    elif block_type == block_type_unordered_list:
+        parent_children = helper_block_to_html(block, "li")
+        block_parent = ParentNode("ul", parent_children)
+    
+    elif block_type == block_type_ordered_list:
+        parent_children = helper_block_to_html(block, "li")
+        block_parent = ParentNode("ol", parent_children)
+    
+    elif block_type == block_type_code:
+        relevant_block = block[3:len(block)-3]
+        textnode_children = text_to_textnodes(relevant_block)
+        leaf_children = []
+        for child in textnode_children:
+            leaf_children.append(text_node_to_html_node(child))
+        parent1 = ParentNode("code", leaf_children)
+        block_parent = ParentNode("pre", [parent1])
+    
+    elif block_type == block_type_heading:
+        heading_num = count_heading_number(block)
+        heading_tag = "h" + str(heading_num)
+        relevant_block = block[heading_num:]
+        textnode_children = text_to_textnodes(relevant_block)
+        leaf_children = []
+        for child in textnode_children:
+            leaf_children.append(text_node_to_html_node(child))
+        block_parent = ParentNode(heading_tag, leaf_children)
+    
+    elif block_type == block_type_paragraph:
+        textnode_children = text_to_textnodes(block)
+        leaf_children = []
+        for child in textnode_children:
+            leaf_children.append(text_node_to_html_node(child))
+        block_parent = ParentNode("p", leaf_children)
+    
+    else:
+        raise Exception("Unexpected Block Type")
+    
+    return block_parent
+
+
+def markdown_to_html_node(markdown):
+    md_block_list = markdown_to_blocks(markdown)
+    fun = lambda block: block_to_html_node(block)
+    htmlnode_list = list(map(fun, md_block_list))
+    return ParentNode("div", htmlnode_list)
