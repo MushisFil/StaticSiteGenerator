@@ -154,6 +154,7 @@ def markdown_to_blocks(markdown):
         lines = list(map(fun, block.split('\n')))
         lines_filtered = list(filter(fun2, lines))
         new_block = '\n'.join(lines_filtered)
+        new_block.lstrip("\n ")
         if new_block != "":
             new_blocks.append(new_block)
     
@@ -258,10 +259,14 @@ def block_to_html_node(block):
     
     elif block_type == block_type_code:
         relevant_block = block[3:len(block)-3]
-        textnode_children = text_to_textnodes(relevant_block)
+        lines = relevant_block.split('\n')
+        fn = lambda x: 1 if x != "" else 0
+        relevant_lines = list(filter(fn, lines))
+        relevant_block2 = '\n'.join(relevant_lines)
+        textnode_children = text_to_textnodes(relevant_block2)
         leaf_children = []
         for child in textnode_children:
-            leaf_children.append(text_node_to_html_node(child))
+                leaf_children.append(text_node_to_html_node(child))
         parent1 = ParentNode("code", leaf_children)
         block_parent = ParentNode("pre", [parent1])
     
@@ -290,10 +295,6 @@ def block_to_html_node(block):
 
 def markdown_to_html_node(markdown):
     md_block_list = markdown_to_blocks(markdown)
-    # count = 0
-    # for block in md_block_list:
-    #     if block == "": count += 1
-    # print(f"Number of empty blocks in the whole doc = {count}")
     fun = lambda block: block_to_html_node(block)
     htmlnode_list = list(map(fun, md_block_list))
     return ParentNode("div", htmlnode_list)
