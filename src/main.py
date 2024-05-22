@@ -71,7 +71,35 @@ def generate_page(from_path, template_path, dest_path):
     html_path = dest_path + filename + '.html'
     with open(html_path, 'w') as f:
         f.write(html)
+
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+    if not os.path.exists(dir_path_content):
+        raise Exception(f"{dir_path_content} does not exist")
+    if not os.path.exists(template_path):
+        raise Exception(f"{template_path} does not exist")
+    if not os.path.exists(dest_dir_path):
+        os.makedirs(dest_dir_path)
     
+    items = os.listdir(dir_path_content)
+    for item in items:
+        item_path = dir_path_content + item
+        if os.path.isfile(item_path):
+            splitted =  item.split('.')
+            # print(splitted)
+            if splitted[1] == 'md':
+                from_path = dir_path_content + item 
+                generate_page(from_path, template_path, dest_dir_path)
+        elif os.path.isdir(item_path):
+            new_from_path = dir_path_content + item + "/"
+            new_to_path = dest_dir_path + item + "/"
+            # print("***********")
+            # print(new_from_path)
+            # print("***********")
+            # print(new_to_path)
+            generate_pages_recursive(new_from_path, template_path, new_to_path)
+
+
+
 
 def main():
     old_dir = "/Users/mustakimfilumar/Documents/boots/github.com/MushisFil/StaticSiteGenerator/static/"
@@ -81,7 +109,9 @@ def main():
     from_path = '/Users/mustakimfilumar/Documents/boots/github.com/MushisFil/StaticSiteGenerator/content/index.md'
     dest_path =  '/Users/mustakimfilumar/Documents/boots/github.com/MushisFil/StaticSiteGenerator/public/'
     template_path = '/Users/mustakimfilumar/Documents/boots/github.com/MushisFil/StaticSiteGenerator/template.html'
-    generate_page(from_path, template_path, dest_path)
+    dir_path_content = '/Users/mustakimfilumar/Documents/boots/github.com/MushisFil/StaticSiteGenerator/content/'
+    # generate_page(from_path, template_path, dest_path)
+    generate_pages_recursive(dir_path_content, template_path, dest_path)
 
 
 
