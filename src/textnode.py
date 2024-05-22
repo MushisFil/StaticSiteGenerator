@@ -153,7 +153,9 @@ def markdown_to_blocks(markdown):
     for block in blocks:
         lines = list(map(fun, block.split('\n')))
         lines_filtered = list(filter(fun2, lines))
-        new_blocks.append('\n'.join(lines_filtered))
+        new_block = '\n'.join(lines_filtered)
+        if new_block != "":
+            new_blocks.append(new_block)
     
     # print(filtered)
     # print('\n\n'.join(new_blocks))
@@ -184,6 +186,8 @@ def check_ordered_list(lines):
 
 
 def block_to_block_type(block):
+    if block == "":
+        raise Exception("Empty block found")
 
     if block[0] == "#":
         return block_type_heading
@@ -200,11 +204,14 @@ def block_to_block_type(block):
     return block_type_paragraph
         
 
-def helper_block_to_html(block, tag_t):
+def helper_block_to_html(block, tag_t, ordered):
     splitted = block.split('\n')
     parent_list = []
     for line in splitted:
-        filtered_line = line[2:]
+        if ordered:
+            filtered_line = line[3:]
+        else:
+            filtered_line = line[2:]
         curr_tn_children = text_to_textnodes(filtered_line)
         curr_ln_children = []
         for child in curr_tn_children:
@@ -242,11 +249,11 @@ def block_to_html_node(block):
         block_parent = ParentNode("blockquote", leaf_children)
 
     elif block_type == block_type_unordered_list:
-        parent_children = helper_block_to_html(block, "li")
+        parent_children = helper_block_to_html(block, "li", 0)
         block_parent = ParentNode("ul", parent_children)
     
     elif block_type == block_type_ordered_list:
-        parent_children = helper_block_to_html(block, "li")
+        parent_children = helper_block_to_html(block, "li", 1)
         block_parent = ParentNode("ol", parent_children)
     
     elif block_type == block_type_code:
@@ -261,7 +268,7 @@ def block_to_html_node(block):
     elif block_type == block_type_heading:
         heading_num = count_heading_number(block)
         heading_tag = "h" + str(heading_num)
-        relevant_block = block[heading_num:]
+        relevant_block = block[heading_num+1:]
         textnode_children = text_to_textnodes(relevant_block)
         leaf_children = []
         for child in textnode_children:
@@ -283,6 +290,10 @@ def block_to_html_node(block):
 
 def markdown_to_html_node(markdown):
     md_block_list = markdown_to_blocks(markdown)
+    # count = 0
+    # for block in md_block_list:
+    #     if block == "": count += 1
+    # print(f"Number of empty blocks in the whole doc = {count}")
     fun = lambda block: block_to_html_node(block)
     htmlnode_list = list(map(fun, md_block_list))
     return ParentNode("div", htmlnode_list)

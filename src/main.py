@@ -1,5 +1,6 @@
 from textnode import TextNode, text_node_to_html_node, split_nodes_delimiter, extract_markdown_images, extract_markdown_links,split_nodes_image, split_nodes_link, text_to_textnodes, markdown_to_blocks, block_to_block_type, markdown_to_html_node
 from htmlnode import HTMLNode, LeafNode, ParentNode
+from blockvars import *
 import os
 import shutil
 import re
@@ -9,11 +10,11 @@ def copy_contents(old_dir, new_dir):
     os.mkdir(new_dir)
 
     if not os.path.exists(old_dir):
-        raise Exception("{old_dir} does not exist")
+        raise Exception(f"{old_dir} does not exist")
     if not os.path.exists(new_dir):
-        raise Exception("{new_dir} does not exist")
+        raise Exception(f"{new_dir} does not exist")
     if old_dir == new_dir :
-        raise Exception("Target directory is the same as source directory")
+        raise Exception(f"Target directory is the same as source directory")
     
     dir_list = os.listdir(old_dir)
 
@@ -31,37 +32,57 @@ def copy_contents(old_dir, new_dir):
             copy_contents(item_path, new_dir_path)
 
 def extract_title(markdown):
+    blocks = markdown_to_blocks(markdown)
+    for block in blocks:
+        if block_to_block_type(block) == block_type_heading:
+            for line in block.split('\n'):
+                match = re.match(r'^# (.+)', line)
+                if match:
+                    return match.group(1).strip()
+        
     match = re.search(r'^# (.+)', markdown, re.MULTILINE)
     if match:
         return match.group(1).strip()
     raise Exception("Title not found")
 
+def generate_page(from_path, template_path, dest_path):
+    if not os.path.exists(from_path):
+        raise Exception(f"{from_path} does not exist")
+    if not os.path.exists(template_path):
+        raise Exception(f"{template_path} does not exist")
+    if not os.path.exists(dest_path):
+        os.makedirs(dest_path)
+
+    print(f"Generating page from {from_path} to {dest_path} using {template_path}...")
+    with open(from_path) as f:
+        markdown = f.read()
+    # print(markdown)
+    with open(template_path) as f:
+        template = f.read()
+    
+    content = markdown_to_html_node(markdown).to_html()
+    title = extract_title(markdown)
+    html = template.replace("{{ Title }}", title)
+    html = html.replace("{{ Content }}", content)
+
+    splitted = from_path.split('/')
+    filename = splitted[len(splitted)-1].split('.')[0]
+    
+    html_path = dest_path + filename + '.html'
+    with open(html_path, 'w') as f:
+        f.write(html)
+    
+
 def main():
-    # old_dir = "/Users/mustakimfilumar/Documents/boots/github.com/MushisFil/StaticSiteGenerator/static/"
-    # new_dir = "/Users/mustakimfilumar/Documents/boots/github.com/MushisFil/StaticSiteGenerator/public/"
-    # copy_contents(old_dir, new_dir)
+    old_dir = "/Users/mustakimfilumar/Documents/boots/github.com/MushisFil/StaticSiteGenerator/static/"
+    new_dir = "/Users/mustakimfilumar/Documents/boots/github.com/MushisFil/StaticSiteGenerator/public/"
+    copy_contents(old_dir, new_dir)
+    # generate_page('/Users/mustakimfilumar/Documents/boots/github.com/MushisFil/StaticSiteGenerator/static/doc.md', 0, 0)
+    from_path = '/Users/mustakimfilumar/Documents/boots/github.com/MushisFil/StaticSiteGenerator/content/index.md'
+    dest_path =  '/Users/mustakimfilumar/Documents/boots/github.com/MushisFil/StaticSiteGenerator/public/'
+    template_path = '/Users/mustakimfilumar/Documents/boots/github.com/MushisFil/StaticSiteGenerator/template.html'
+    generate_page(from_path, template_path, dest_path)
 
-    md_doc = """## This is **bolded** paragraph
-
-    This is another paragraph with *italic* text and `code` here
-    This is the same paragraph on a new line
-
-    * This is a list
-    * with items
-
-    # Hidden title hehe
-
-    >You seem to be laboring under the delusion that I’m going to, what was the phrase, come quietly?
-    >Well I can tell you this - I have no intention of going to Azkaban
-
-    1. Order number 1
-    2. Order number 2
-    3. Order number 3
-
-    ```print("HARRYDIDYOUPUTYOURNAMEINTHEGOBLETOFFIRE")```
-    """
-
-    print(extract_title(md_doc))
 
 
 if __name__ == "__main__":
